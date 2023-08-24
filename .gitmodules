@@ -1,0 +1,3 @@
+[submodule "ProxyPanel"]
+	path = ProxyPanel
+	url = https://github.com/ExtraConvenient/ProxyPanel

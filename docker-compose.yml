@@ -1,0 +1,47 @@
+name: proxypanel-dev
+services:
+    app:
+        image: proxypanel-dev
+        build: .
+        command: ["sh", "/start-server.sh"]
+        ports:
+            - 8080:8000
+        volumes:
+            - ./ProxyPanel:/app
+        depends_on:
+            - db
+            - redis
+    queue:
+        image: proxypanel-dev
+        command: ["sh", "/queue.sh"]
+        volumes:
+            - ./ProxyPanel:/app
+        depends_on:
+            - app
+        restart: on-failure
+    schedule:
+        image: proxypanel-dev
+        command: ["cron", "-f"]
+        volumes:
+            - ./ProxyPanel:/app
+        depends_on:
+            - app
+    db:
+        image: mysql
+        volumes:
+            - ./.mysql:/var/lib/mysql
+        environment:
+            - MYSQL_ROOT_PASSWORD=12345
+            - MYSQL_DATABASE=ProxyPanel
+            - MYSQL_USER=dev
+            - MYSQL_PASSWORD=12345
+    redis:
+        image: redis:alpine
+        volumes:
+            - ./.redis:/data
+    phpmyadmin:
+        image: phpmyadmin:apache
+        ports:
+            - 8081:80
+        depends_on:
+            - db
